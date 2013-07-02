@@ -34,8 +34,8 @@ def listRead(infotype, baseURL, level):
     jout = convertJSON(url)
 
     #Identify the lowest available date
-    av_dates = [jout["requested_information"][i] for i in
-                range(jout["requested_information"])]
+    av_dates = [jout["requested_information"][i]["stats"]["available_date"]
+                for i in range(len(jout["requested_information"]))]
     lowest = min(av_dates)
 
     #Identify the current time
