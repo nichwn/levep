@@ -68,3 +68,17 @@ baseURL = "http://www.wanikani.com/api/user/" + api
 url = baseURL + "/user-information"
 userInfo = convertJSON(url)
 level = userInfo["user_information"]["level"]
+
+#Output the results
+for inftype in INFTYPES:
+    time = list_read(inftype, baseURL, level)
+    if time is None:
+        print "No unlocked {} for the current level.".format(inftype)
+    else:
+        if inftype == "radicals":
+            inftype = "radical"
+        print "Next {}: {} days {} hours {} minutes {} seconds".format(inftype,
+                                                                       time[0],
+                                                                       time[1],
+                                                                       time[2],
+                                                                       time[3])
