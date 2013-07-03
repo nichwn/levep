@@ -29,6 +29,15 @@ def convertJSON(url):
     return json.load(urllib.urlopen(url))
 
 
+def lev_cal(baseURL):
+    """
+    Obtain's the user's level.
+    """
+    url = baseURL + "/user-information"
+    userInfo = convertJSON(url)
+    return userInfo["user_information"]["level"]  
+
+
 def list_read(inftype, baseURL, level):
     """
     Return length of time until the soonest, current level's radical or kanji.
@@ -59,7 +68,7 @@ def list_read(inftype, baseURL, level):
     minutes = revnext / 60 % 60
     hours = revnext / 3600 % 24
     days = revnext / 86400
-
+    
     return (days, hours, minutes, seconds)
 
 
@@ -114,7 +123,7 @@ def reqAPI(nokeyURL):
             except:
                 print ("\nNo user found for the API key provided. " +
                        "Please try again.\n\n")
-                
+
         
 #Construct basic URL
 nokeyURL = "http://www.wanikani.com/api/user/"
@@ -122,9 +131,7 @@ api = getAPI(nokeyURL)
 baseURL = nokeyURL + api
 
 #Obtain user's level
-url = baseURL + "/user-information"
-userInfo = convertJSON(url)
-level = userInfo["user_information"]["level"]
+level = lev_cal(baseURL)
 
 #Output the results
 for inftype in INFTYPES:
