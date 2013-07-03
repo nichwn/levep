@@ -1,15 +1,7 @@
 """
 
-Title:        levep
-
 Description:  Identify the next review time for the earliest apprentice radical
               and kanji of the user's level
-
-Author:       Nicholas Brown
-
-Email:        nichwn@gmail.com
-
-Date Created: 2013-07-02
 
 """
 import urllib
