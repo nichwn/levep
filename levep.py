@@ -19,7 +19,29 @@ import calendar
 import os.path
 
 
-INFTYPES = ["radicals", "kanji"]
+def main():
+    #API key storage location
+    fname = "api.dat"
+
+    #Construct basic URL
+    nokeyURL = "http://www.wanikani.com/api/user/"
+    api = getAPI(fname, nokeyURL)
+    baseURL = nokeyURL + api
+
+    #Obtain user's level
+    level = lev_cal(baseURL)
+
+    #Output the length of time
+    resout(baseURL, level)
+
+    #Check if the user wants to change their API key.
+    inp = raw_input("\nDid you want to change your API key? If so, type " +
+                    "'reset' and press 'Enter'. Else, just press 'Enter' " +
+                    "to close the program.\n")
+    if inp.lower() == "reset":
+        os.remove(fname)
+        print
+        main()
 
 
 def convertJSON(url):
@@ -35,7 +57,7 @@ def lev_cal(baseURL):
     """
     url = baseURL + "/user-information"
     userInfo = convertJSON(url)
-    return userInfo["user_information"]["level"]  
+    return userInfo["user_information"]["level"]
 
 
 def list_read(inftype, baseURL, level):
@@ -68,7 +90,7 @@ def list_read(inftype, baseURL, level):
     minutes = revnext / 60 % 60
     hours = revnext / 3600 % 24
     days = revnext / 86400
-    
+
     return (days, hours, minutes, seconds)
 
 
@@ -124,36 +146,22 @@ def reqAPI(nokeyURL):
                        "Please try again.\n\n")
 
 
-#API key storage location
-fname = "api.dat"
+def resout(baseURL, level):
+    """
+    Outputs the length of time until the soonest, current level's radicals
+    and kanji.
+    """
+    INFTYPES = ["radicals", "kanji"]
+    for inftype in INFTYPES:
+        time = list_read(inftype, baseURL, level)
+        if time is None:
+            print "No unlocked {} for the current level.".format(inftype)
+        else:
+            if inftype == "radicals":
+                inftype = "radical"
+            print ("Next {}: {} days ".format(inftype, time[0]) +
+                   "{} hours {} minutes {} seconds".format(time[1], time[2],
+                                                           time[3]))
 
-#Construct basic URL
-nokeyURL = "http://www.wanikani.com/api/user/"
-api = getAPI(fname, nokeyURL)
-baseURL = nokeyURL + api
-
-#Obtain user's level
-level = lev_cal(baseURL)
-
-#Output the results
-for inftype in INFTYPES:
-    time = list_read(inftype, baseURL, level)
-    if time is None:
-        print "No unlocked {} for the current level.".format(inftype)
-    else:
-        if inftype == "radicals":
-            inftype = "radical"
-        print "Next {}: {} days {} hours {} minutes {} seconds".format(inftype,
-                                                                       time[0],
-                                                                       time[1],
-                                                                       time[2],
-                                                                       time[3])
-
-#Check if one wants to change their API key.
-inp = raw_input("\nDid you want to change your API key? If so, type 'reset' " +
-                "and press 'Enter'. Else, just press 'Enter' to close the " +
-                "program.\n")
-if inp.lower() == "reset":
-    os.remove(fname)
-    print
-    getAPI(fname, nokeyURL)
+if __name__ == "__main__":
+    main()
