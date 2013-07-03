@@ -72,12 +72,11 @@ def list_read(inftype, baseURL, level):
     return (days, hours, minutes, seconds)
 
 
-def getAPI(nokeyURL):
+def getAPI(fname, nokeyURL):
     """
     Grabs the user's API key, or requests and stores a new one from user input
     if it is not found.
     """
-    fname = "api.dat"
     fl = open(fname, "a").close()  # create an empty file if none exists
     fl = open(fname, "r+")
     data = fl.read()
@@ -124,10 +123,13 @@ def reqAPI(nokeyURL):
                 print ("\nNo user found for the API key provided. " +
                        "Please try again.\n\n")
 
-        
+
+#API key storage location
+fname = "api.dat"
+
 #Construct basic URL
 nokeyURL = "http://www.wanikani.com/api/user/"
-api = getAPI(nokeyURL)
+api = getAPI(fname, nokeyURL)
 baseURL = nokeyURL + api
 
 #Obtain user's level
@@ -146,3 +148,12 @@ for inftype in INFTYPES:
                                                                        time[1],
                                                                        time[2],
                                                                        time[3])
+
+#Check if one wants to change their API key.
+inp = raw_input("\nDid you want to change your API key? If so, type 'reset' " +
+                "and press 'Enter'. Else, just press 'Enter' to close the " +
+                "program.\n")
+if inp.lower() == "reset":
+    os.remove(fname)
+    print
+    getAPI(fname, nokeyURL)
