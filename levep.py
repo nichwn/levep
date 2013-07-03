@@ -69,9 +69,12 @@ def getAPI(nokeyURL):
     if it is not found.
     """
     fname = "api.dat"
+    fl = open(fname, "a").close()  # create an empty file if none exists
+    fl = open(fname, "r+")
+    data = fl.read()
 
     #Create the file to store the API key, if none exists.
-    if not os.path.exists(fname):
+    if not data:
         fl = open(fname, "w")
         api = reqAPI(nokeyURL)
         fl.write(api)
@@ -80,8 +83,7 @@ def getAPI(nokeyURL):
         return api
 
     #Read the stored API key
-    fl = open(fname, "r+")
-    return fl.read()
+    return data
 
 
 def reqAPI(nokeyURL):
