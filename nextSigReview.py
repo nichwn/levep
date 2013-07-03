@@ -18,6 +18,8 @@ from datetime import datetime
 import calendar
 
 
+INFTYPES = ["radicals", "kanji"]
+
 def convertJSON(url):
     """
     Read a URL string and deserialise it as JSON.
@@ -25,18 +27,21 @@ def convertJSON(url):
     return json.load(urllib.urlopen(url))
 
 
-def list_read(infotype, baseURL, level):
+def list_read(inftype, baseURL, level):
     """
     Return length of time until the soonest, current level's radical or kanji.
     """
-    url = baseURL + "/{}/{}".format(infotype, level)
+    url = baseURL + "/{}/{}".format(inftype, level)
     jout = convertJSON(url)
 
     #Identify the lowest available date
     av_dates = [jout["requested_information"][i]["stats"]["available_date"]
                 for i in range(len(jout["requested_information"]))
                 if jout["requested_information"][i]["stats"] is not None]
-    lowest = min(av_dates)
+    try:
+        lowest = min(av_dates)
+    except:
+        return None  # no unlocked inftype for the current level
 
     #Identify the current time
     ctime = datetime.utcnow()
@@ -44,7 +49,6 @@ def list_read(infotype, baseURL, level):
 
     #Calculate the next review time
     revnext = int(lowest) - cunix
-    print cunix, int(lowest), revnext
     if revnext < 0:
         revnext = 0
 
@@ -64,4 +68,3 @@ baseURL = "http://www.wanikani.com/api/user/" + api
 url = baseURL + "/user-information"
 userInfo = convertJSON(url)
 level = userInfo["user_information"]["level"]
-
