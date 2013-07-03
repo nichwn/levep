@@ -25,17 +25,17 @@ def convertJSON(url):
     return json.load(urllib.urlopen(url))
 
 
-def listRead(infotype, baseURL, level):
+def list_read(infotype, baseURL, level):
     """
     Return length of time until the soonest, current level's radical or kanji.
     """
-    #TO-DO: Test this
     url = baseURL + "/{}/{}".format(infotype, level)
     jout = convertJSON(url)
 
     #Identify the lowest available date
     av_dates = [jout["requested_information"][i]["stats"]["available_date"]
-                for i in range(len(jout["requested_information"]))]
+                for i in range(len(jout["requested_information"]))
+                if jout["requested_information"][i]["stats"] is not None]
     lowest = min(av_dates)
 
     #Identify the current time
@@ -43,24 +43,16 @@ def listRead(infotype, baseURL, level):
     cunix = calendar.timegm(ctime.utctimetuple())
 
     #Calculate the next review time
-    revnext = cunix - int(lowest)
+    revnext = int(lowest) - cunix
+    print cunix, int(lowest), revnext
     if revnext < 0:
         revnext = 0
 
     #Convert to a more readable format
-    days = hours = minutes = seconds = 0
     seconds = revnext % 60
-    revnextmin = revnext / 60
-    if revnextmin >= 60:
-        minutes = revnextmin % 60
-        revnexthr = revnextmin / 60
-        if revnexthr >= 60:
-            hours = revnexthr % 24
-            days = revnexthr / 24
-        else:
-            hours = revnexthr
-    else:
-        minutes = revnextmin
+    minutes = revnext / 60 % 60
+    hours = revnext / 3600 % 24
+    days = revnext / 86400
 
     return (days, hours, minutes, seconds)
         
