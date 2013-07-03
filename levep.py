@@ -3,7 +3,7 @@
 Title:        levep
 
 Description:  Identify the next review time for the earliest apprentice radical
-              and kanji of the user's level 
+              and kanji of the user's level
 
 Author:       Nicholas Brown
 
@@ -16,9 +16,11 @@ import urllib
 import json
 from datetime import datetime
 import calendar
+import os.path
 
 
 INFTYPES = ["radicals", "kanji"]
+
 
 def convertJSON(url):
     """
@@ -59,10 +61,63 @@ def list_read(inftype, baseURL, level):
     days = revnext / 86400
 
     return (days, hours, minutes, seconds)
+
+
+def getAPI(nokeyURL):
+    """
+    Grabs the user's API key, or requests and stores a new one from user input
+    if it is not found.
+    """
+    fname = "api.dat"
+
+    #Create the file to store the API key, if none exists.
+    if not os.path.exists(fname):
+        fl = open(fname, "w")
+        api = reqAPI(nokeyURL)
+        fl.write(api)
+        print "\nSuccess! API key stored.\n\n"
+        fl.close()
+        return api
+
+    #Read the stored API key
+    fl = open(fname, "r+")
+    return fl.read()
+
+
+def reqAPI(nokeyURL):
+    """
+    Requests the user's API key.
+    """
+    while True:
+        api = raw_input("Type your API key and press 'Enter'.\n")
+
+        #API keys have 32 characters.
+        if not len(api) == 32:
+            print "\nInvalid API key. Please try again.\n\n"
+        else:
+
+            #Check that the correct API key was typed.
+            try:
+                jout = convertJSON(nokeyURL + api + "/user-information")
+                user = jout["user_information"]["username"]
+                crct = raw_input("\nAre you {}? If so, type 'Y'".format(user) +
+                                 " and then press 'Enter', else just press " +
+                                 "'Enter'.\n")
+                if crct.upper() == "Y":
+                    return api
+                else:
+                    print "Not you? Please try again.\n\n"
+
+            #No user found for the given API key
+            except:
+                print ("\nNo user found for the API key provided. " +
+                       "Please try again.\n\n")
+                
         
 #Construct basic URL
-api = "abd8edba52a2d02b7f4cc6ab328b47b8"  # TO-DO: save this value and load
-baseURL = "http://www.wanikani.com/api/user/" + api
+nokeyURL = "http://www.wanikani.com/api/user/"
+api = getAPI(nokeyURL)
+baseURL = nokeyURL + api
 
 #Obtain user's level
 url = baseURL + "/user-information"
