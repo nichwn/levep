@@ -68,8 +68,8 @@ def list_read(inftype, baseURL, level):
 
     #Calculate the next review time
     revnext = int(lowest) - cunix
-    if revnext < 0:
-        revnext = 0
+    if revnext <= 0:
+        return "available"  # reviews are currently available
 
     #Convert to a more readable format
     seconds = revnext % 60
@@ -89,7 +89,7 @@ def getAPI(fname, nokeyURL):
     fl = open(fname, "r+")
     data = fl.read()
 
-    #Create the file to store the API key, if none exists.
+    #Store the API key, if none exists.
     if not data:
         fl = open(fname, "w")
         api = reqAPI(nokeyURL)
@@ -140,8 +140,12 @@ def resout(baseURL, level):
     INFTYPES = ["radicals", "kanji"]
     for inftype in INFTYPES:
         time = list_read(inftype, baseURL, level)
+
+        #Output the length of time
         if time is None:
             print "No unlocked {} for the current level.".format(inftype)
+        elif time == "available":
+            print "There are {} available for review!".format(inftype)
         else:
             if inftype == "radicals":
                 inftype = "radical"
