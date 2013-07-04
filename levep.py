@@ -7,11 +7,11 @@ import os.path
 
 def main():
     #API key storage location
-    fname = "api.dat"
+    FNAME = "api.dat"
 
     #Construct basic URL
     nokeyURL = "http://www.wanikani.com/api/user/"
-    api = getAPI(fname, nokeyURL)
+    api = getAPI(FNAME, nokeyURL)
     baseURL = nokeyURL + api
 
     #Obtain user's level
@@ -25,7 +25,7 @@ def main():
                     "'reset' and press 'Enter'. Else, just press 'Enter' " +
                     "to close the program.\n")
     if inp.lower() == "reset":
-        os.remove(fname)
+        os.remove(FNAME)
         print
         main()
 
@@ -50,6 +50,9 @@ def list_read(inftype, baseURL, level):
     """
     Return length of time until the soonest, current level's radical or kanji.
     """
+    SEC_PER_MIN = 60
+    MIN_PER_HOUR = 60
+    HOUR_PER_DAY = 24
     url = baseURL + "/{}/{}".format(inftype, level)
     jout = convertJSON(url)
 
@@ -72,10 +75,10 @@ def list_read(inftype, baseURL, level):
         return "available"  # reviews are currently available
 
     #Convert to a more readable format
-    seconds = revnext % 60
-    minutes = revnext / 60 % 60
-    hours = revnext / 3600 % 24
-    days = revnext / 86400
+    seconds = revnext % SEC_PER_MIN
+    minutes = revnext / SEC_PER_MIN % MIN_PER_HOUR
+    hours = revnext / (SEC_PER_MIN * MIN_PER_HOUR) % HOUR_PER_DAY
+    days = revnext / (SEC_PER_MIN * MIN_PER_HOUR * HOUR_PER_DAY)
 
     return (days, hours, minutes, seconds)
 
