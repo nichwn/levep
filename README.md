@@ -37,6 +37,9 @@ THE SOFTWARE.
 Changelog
 ---------
 
+### v0.1.1
+* Modified the message when one has reviews currently available.
+
 ### v0.1
 
 * Initial release
