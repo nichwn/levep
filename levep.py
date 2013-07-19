@@ -94,7 +94,6 @@ def getAPI(fname, nokeyURL):
 
     #Store the API key, if none exists.
     if not data:
-        fl = open(fname, "w")
         api = reqAPI(nokeyURL)
         fl.write(api)
         print "\nSuccess! API key stored.\n\n"
