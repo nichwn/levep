@@ -37,6 +37,9 @@ THE SOFTWARE.
 Changelog
 ---------
 
+### v0.1.2
+* Updated for Wanikani API version 1.2.
+
 ### v0.1.1
 * Modified the message when one has reviews currently available.
 

@@ -10,9 +10,10 @@ def main():
     FNAME = "api.dat"
 
     #Construct basic URL
-    nokeyURL = "http://www.wanikani.com/api/user/"
-    api = getAPI(FNAME, nokeyURL)
-    baseURL = nokeyURL + api
+    APIVER = "v1.2"
+    NOKEYURL = "http://www.wanikani.com/api/" + APIVER + "/user/"
+    api = getAPI(FNAME, NOKEYURL)
+    baseURL = NOKEYURL + api
 
     #Obtain user's level
     level = lev_cal(baseURL)
@@ -57,9 +58,11 @@ def list_read(inftype, baseURL, level):
     jout = convertJSON(url)
 
     #Identify the lowest available date
-    av_dates = [jout["requested_information"][i]["stats"]["available_date"]
+    av_dates = [jout["requested_information"][i]["user_specific"]
+    	        ["available_date"]
                 for i in range(len(jout["requested_information"]))
-                if jout["requested_information"][i]["stats"] is not None]
+                if jout["requested_information"][i]["user_specific"]
+                is not None]
     try:
         lowest = min(av_dates)
     except:
@@ -83,7 +86,7 @@ def list_read(inftype, baseURL, level):
     return (days, hours, minutes, seconds)
 
 
-def getAPI(fname, nokeyURL):
+def getAPI(fname, nokeyurl):
     """
     Grabs the user's API key, or requests and stores a new one from user input
     if it is not found.
@@ -94,7 +97,7 @@ def getAPI(fname, nokeyURL):
 
     #Store the API key, if none exists.
     if not data:
-        api = reqAPI(nokeyURL)
+        api = reqAPI(nokeyurl)
         fl.write(api)
         print "\nSuccess! API key stored.\n\n"
         fl.close()
@@ -104,7 +107,7 @@ def getAPI(fname, nokeyURL):
     return data
 
 
-def reqAPI(nokeyURL):
+def reqAPI(nokeyurl):
     """
     Requests the user's API key.
     """
@@ -118,7 +121,7 @@ def reqAPI(nokeyURL):
 
             #Check that the correct API key was typed.
             try:
-                jout = convertJSON(nokeyURL + api + "/user-information")
+                jout = convertJSON(nokeyurl + api + "/user-information")
                 user = jout["user_information"]["username"]
                 crct = raw_input("\nAre you {}? If so, type 'Y'".format(user) +
                                  " and then press 'Enter', else just press " +
@@ -134,14 +137,14 @@ def reqAPI(nokeyURL):
                        "Please try again.\n\n")
 
 
-def resout(baseURL, level):
+def resout(baseurl, level):
     """
     Outputs the length of time until the soonest, current level's radicals
     and kanji.
     """
     INFTYPES = ["radicals", "kanji"]
     for inftype in INFTYPES:
-        time = list_read(inftype, baseURL, level)
+        time = list_read(inftype, baseurl, level)
 
         #Output the length of time
         if time is None:
